@@ -4,22 +4,34 @@ const { v4: uuid } = require('uuid')
 
 async function createFood(req, res) {
 
-    console.log(req.foodPartner);
-
-    console.log(req.body);
-    console.log(req.file);
-    
-
     const fileUploadResult = await storageService.uploadFile(req.file.buffer, uuid())
 
-    console.log(fileUploadResult);
+
+    const foodItem = await foodModel.create({
+        name: req.body.name,
+        description: req.body.description,
+        video: fileUploadResult.url,
+        foodPartner: req.foodPartner._id
+    })
     
     
-    
-    res.send("food item created")
+    res.status(201).json({
+        message:"food created successfully",
+        food: foodItem
+    })
+}
+
+async function getFoodItem(req, res, next) {
+    const foodItem = await foodModel.find({})
+
+    res.status(200).json({
+        message:"Food item Fetched successfully",
+        foodItem
+    })
 }
 
 
 module.exports = {
-    createFood
+    createFood,
+    getFoodItem
 };
